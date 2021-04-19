@@ -446,8 +446,122 @@ def bfs(initialState, goalState, output):
     print(frontier)
 
 
-def dfs(initialState, goalState, output):
-    print("dfs")
+class gameState: #UNUSED, NOT WORTH
+    def __init__(cLeft, wLeft, bLeft, cRight, wRight, bRight):
+        self.cLeft = cLeft
+        self.wLeft = wLeft
+        self.bLeft = bLeft
+        self.cRight = cRight
+        self.wRight = wRight
+        self.bRight = bRight
+
+    def __eq__(self,other):
+        pass
+
+    def isValidState(self):
+        if cLeft >= 0 and wLeft >= 0 and cRight >= 0 and wRight >= 0 and (cLeft >= wLeft or cLeft == 0) and (cRight >= wRight or cRight == 0):
+            return True
+        else:
+            return False
+
+
+    def print(self):
+        return
+
+
+# handler for recursive dfs
+def dfs(initialState, goalState,output):
+    # Convert list of strings with commas into a usable list of ints
+    listState = []
+    for element in initialState:
+        element = element.replace(',','')
+        for item in element:
+            listState.append(int(item))
+    print(listState)
+
+
+
+
+
+
+
+
+    # output is a filename
+
+    counter = 0 # Number of nodes expanded.
+
+    #implement the graph-search version, which is complete
+    frontier = [listState]
+    explored = []
+    print("Starting recursive calls...")
+    dfs_recursive(frontier,goalState,explored)
+
+
+
+
+def dfs_recursive(frontier,goalState,explored):
+    # frontier: a list of states in a LIFO queue
+    # goalState: a list containing the goal state
+    # explored: a list of states that have been explored (popped)
+    # output: a list of states tracing back to the root???
+
+
+    # if frontier empty, return fail
+    if frontier is None:
+        print("Frontier empty! Failed.")
+
+    #pop frontier[0].
+    # TA said compare node with goal when its popped
+    currentNode = frontier.pop() # pop off front of LIFO for DFS
+
+    # Check if goal is reached
+    if currentNode == goalState:
+        return
+
+    expand(currentNode,frontier,explored)
+
+
+
+
+
+
+
+def expand(state,frontier,explored): # expands a state, generating up to 5 unexplored leaves to add to the Frontier
+    print("Expanding",state)
+    LC = 0
+    LW = 1
+    LB = 2
+    RC = 3
+    RW = 4
+    RB = 5
+    # Process:
+    # generate leaf
+    # check if valid
+    # if explored, don't add to frontier
+
+
+    # 1 chicken in the boat
+    generated = state
+    if(generated[LB]): # if boat is on left side
+        generated[LC] -= 1
+        generated[RC] += 1
+    else:
+        generated[LC] += 1
+        generated[RC] -= 1
+    generated[LB] ^= 1 # swap boat bank
+    generated[RB] ^= 1 # swap boat bank
+    if isValidMove(generated) and generated not in explored:
+        frontier.insert(0,node)
+
+    # 2 chickens in the boat
+    frontier.insert(0,node)
+    frontier.insert(0,node) # 1 wolf in the boat
+    frontier.insert(0,node) # 1 wolf 1 chicken
+    frontier.insert(0,node) # 2 wolves in the boat
+    pass
+
+
+
 
 
 def iddfs(initialState, goalState, output):
