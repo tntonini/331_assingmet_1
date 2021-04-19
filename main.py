@@ -472,17 +472,19 @@ class gameState: #UNUSED, NOT WORTH
 # handler for recursive dfs
 def dfs(initialState, goalState,output):
     # Convert list of strings with commas into a usable list of ints
-    listState = []
+    initial = []
     for element in initialState:
         element = element.replace(',','')
         for item in element:
-            listState.append(int(item))
-    print(listState)
+            initial.append(int(item))
 
-
-
-
-
+    goal = []
+    for element in goalState:
+        element = element.replace(',','')
+        for item in element:
+            goal.append(int(item))
+    print(initial)
+    print(goal)
 
 
 
@@ -491,8 +493,11 @@ def dfs(initialState, goalState,output):
     counter = 0 # Number of nodes expanded.
 
     #implement the graph-search version, which is complete
-    frontier = [listState]
+    frontier = []
+    frontier.insert(0,initial) # add initial state / root
     explored = []
+
+
     print("Starting recursive calls...")
     dfs_recursive(frontier,goalState,explored)
 
@@ -510,24 +515,23 @@ def dfs_recursive(frontier,goalState,explored):
     if frontier is None:
         print("Frontier empty! Failed.")
 
-    #pop frontier[0].
+    #pop frontier.
     # TA said compare node with goal when its popped
     currentNode = frontier.pop() # pop off front of LIFO for DFS
-
+    expanded_count += 1 # Increment count between pop and expansion
     # Check if goal is reached
     if currentNode == goalState:
+        print("Goal reached")
         return
+    explored.append(currentNode)
 
     expand(currentNode,frontier,explored)
 
 
 
-
-
-
-
 def expand(state,frontier,explored): # expands a state, generating up to 5 unexplored leaves to add to the Frontier
     print("Expanding",state)
+    print("Frontier:",frontier)
     LC = 0
     LW = 1
     LB = 2
@@ -558,6 +562,8 @@ def expand(state,frontier,explored): # expands a state, generating up to 5 unexp
     frontier.insert(0,node) # 1 wolf in the boat
     frontier.insert(0,node) # 1 wolf 1 chicken
     frontier.insert(0,node) # 2 wolves in the boat
+
+    print("New Frontier:", frontier)
     pass
 
 
