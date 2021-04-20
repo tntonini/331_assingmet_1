@@ -457,8 +457,9 @@ def bfs(initialState, goalState, output):
     print(frontier)
 
 
+
 class node:
-    def __init__(self, state, children=None):
+    def __init__(self, state, children = None):
         self.state = state
         self.children = children or []
         self.parent = None
@@ -466,7 +467,9 @@ class node:
             child.parent = self
 
 
-class gameState:  # UNUSED, NOT WORTH
+
+class gameState: #UNUSED, NOT WORTH
+
     def __init__(state):
         self.state = state
         # self.cLeft = cLeft
@@ -476,7 +479,9 @@ class gameState:  # UNUSED, NOT WORTH
         # self.wRight = wRight
         # self.bRight = bRight
 
-    def __eq__(self, other):
+
+    def __eq__(self,other):
+
         return self.state == other.state
 
     def isValidState(self):
@@ -502,12 +507,12 @@ def isValidMove(state):
         return False
     return True
 
-
 def printExplored(explored):
     index = 0
     for list in explored:
-        print(index, list)
+        print(index,list)
         index += 1
+
 
 # handler for recursive dfs
 
@@ -574,6 +579,7 @@ def expand(state, frontier, explored):
     # generate leaf
     # if valid and unexplored, add to frontier
 
+
     # 1: 1 chicken in the boat
     generated = state.copy()
     if(generated[LB]):  # if boat is on left side
@@ -582,8 +588,10 @@ def expand(state, frontier, explored):
     else:
         generated[LC] += 1
         generated[RC] -= 1
+
     generated[LB] ^= 1  # swap boat bank
     generated[RB] ^= 1  # swap boat bank
+
     if isValidMove(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
@@ -647,7 +655,7 @@ def expand(state, frontier, explored):
     if isValidMove(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
-    # print("Expand() found ", len(leaves), "leaves")
+    # print("Expand() found ", len(leaves), "leaves"
 
     return leaves
 
