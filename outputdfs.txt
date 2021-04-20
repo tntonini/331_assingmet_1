@@ -1,4 +1,5 @@
 Nodes explored: 750
+Path length: 750
 [LC LW LB RC RW RB]
 [0, 0, 0, 96, 94, 1]
 [0, 2, 1, 96, 92, 0]

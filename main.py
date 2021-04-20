@@ -1,6 +1,7 @@
 import getopt
 import sys
 from contextlib import redirect_stdout
+import heapq
 
 
 expanded_count = 0
@@ -457,7 +458,7 @@ def bfs(initialState, goalState, output):
     print(frontier)
 
 
-
+# UNUSED
 class node:
     def __init__(self, state, children = None):
         self.state = state
@@ -544,6 +545,8 @@ def dfs(initialState, goalState, output):
             # print(explored_count,"Popped",currentNode,"off frontier") #DEBUG
             if currentNode == goal:
                 print("Nodes explored:", explored_count)
+                print("Path length:",explored_count)
+                print("# [LC LW LB RC RW RB]")
                 printExplored(explored)
 
                 f.write("Nodes explored: "+str(explored_count)+"\n")
@@ -569,12 +572,6 @@ def dfs(initialState, goalState, output):
 def expand(state, frontier, explored):
     # expands a state, adding up to 5 unexplored leaves to the Frontier
     leaves = []
-    LC = 0
-    LW = 1
-    LB = 2
-    RC = 3
-    RW = 4
-    RB = 5
     # Process:
     # generate leaf
     # if valid and unexplored, add to frontier
@@ -712,8 +709,68 @@ def recursive_iddfs(explored, current, goal, depth, numNodes):
     return False
 
 
+
+def heuristic(n,goal):
+    if n == goal: return 0
+    # assume animals start on left bank and move to right bank
+    return max(1,(n[RC] + n[RW])-1)
+    # subtract 1, becuase up to 2 animals can be moved at once for final move
+    # 1 animal left: returns 1
+    # 2 animals left: returns 1
+    # 3 animals left: returns 2 (an underestimate)
+
 def astar(initialState, goalState, output):
-    print("astar")
+    with open(output, "w") as f:
+        # output is a filename
+        initial = []
+        for line in initialState:
+            for var in line.split(","):   # store every item as its own element,
+                # even if there are multiple on 1 line
+                initial.append(int(var))
+        print("Start: ", initial)
+        goal = []
+        for line in goalState:
+            for var in line.split(","):   # store every item as its own element,
+                goal.append(int(var))  # even if there are multiple on 1 line
+        print("Goal: ", goal)
+
+        frontier = {} # Frontier is a dictionary with key = f(n) and value = state
+        frontier[heuristic(initial,goal)] = initial # add initial element to the frontier
+        explored = []
+        explored_count = 0  # A count of how many nodes have been explored/popped
+        while frontier: #while frontier isn't empty
+            #min(frontier) is the lowest f(n), so frontier[min(frontier)] is the best node
+            key = min(frontier)
+            currentNode = frontier.pop(key)
+            print("Popped",currentNode,"with heuristic",key)
+
+            #currentNode = frontier.pop(0)
+            if currentNode in explored:  # duplicates are allowed in the frontier
+                continue
+            explored.append(currentNode)
+            # print(explored_count,"Popped",currentNode,"off frontier") #DEBUG
+            if currentNode == goal:
+                print("Nodes explored:", explored_count)
+                printExplored(explored)
+
+                f.write("Nodes explored: "+str(explored_count)+"\n")
+                f.write("Path length: "+str(explored_count)+"\n")
+                f.write("[LC LW LB RC RW RB]\n")
+                for state in explored:
+                    f.write(str(state)+"\n")
+                return
+            # explored.append(currentNode)
+            explored_count += 1
+            children = expand(currentNode, frontier, explored)
+
+            for child in children:
+                frontier[heuristic(child,goal)] = child
+
+        print("no solution found")
+        print("Nodes explored:", explored_count)
+        f.write("no solution found\n")
+        f.write("Nodes explored:"+str(explored_count)+"\n")
+        return
 
 
 def main():
