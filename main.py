@@ -458,10 +458,7 @@ def bfs(initialState, goalState, output):
     print(frontier)
 
 
-<<<<<<< HEAD
-# UNUSED
-=======
->>>>>>> 6bf16bb96979bcfaab6122f5aaa67ce75bc9bb23
+
 class node:
     def __init__(self, state, children=None):
         self.state = state
@@ -734,6 +731,10 @@ def heuristic(n,goal):
     # 2 animals left: returns 1
     # 3 animals left: returns 2 (an underestimate)
 
+def listToString(list):
+    string_list = [str(int) for int in list]
+    return "".join(string_list)
+
 def astar(initialState, goalState, output):
     with open(output, "w") as f:
         # output is a filename
@@ -750,9 +751,18 @@ def astar(initialState, goalState, output):
         print("Goal: ", goal)
 
         frontier = {} # Frontier is a dictionary with key = f(n) and value = state
-        frontier[heuristic(initial,goal)] = initial # add initial element to the frontier
+        print(listToString(initial))
+        return
+
+        frontier[] = initial # add initial element to the frontier
         explored = []
         explored_count = 0  # A count of how many nodes have been explored/popped
+
+        g_set = [] # cost to get to n from start
+        h_set = [] #
+        f_set = [] # f(n) = g(n) + h(n)
+        node_index = 0
+
         while frontier: #while frontier isn't empty
             #min(frontier) is the lowest f(n), so frontier[min(frontier)] is the best node
             key = min(frontier)
@@ -779,6 +789,8 @@ def astar(initialState, goalState, output):
             children = expand(currentNode, frontier, explored)
 
             for child in children:
+                new_g = g[parent] + 1
+                if new_g < g[child]
                 frontier[heuristic(child,goal)] = child
 
         print("no solution found")
