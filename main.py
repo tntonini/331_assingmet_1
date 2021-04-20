@@ -2,6 +2,7 @@ import getopt
 import sys
 from contextlib import redirect_stdout
 import heapq
+import queue
 
 
 expanded_count = 0
@@ -14,413 +15,413 @@ RW = 4
 RB = 5
 
 
-# def inVisited(visited, element):
-#     if element in visited:
-#         return True
-#     else:
-#         return False
+def inVisited(visited, element):
+    if element in visited:
+        return True
+    else:
+        return False
 
 
-# def makeTree(frontier, key, visited):
-#     # get initial state
-#     initial = frontier[0]
-#     # for dictionary
-#     # split into left bank and right bank
-#     left, right = initial
-#     # get the corresponding variables for the left and right banks
-#     cLeft, wLeft, bLeft = left.split(',')
-#     cRight, wRight, bRight = right.split(',')
-#     # Convert to ints
-#     cLeft = int(cLeft)
-#     wLeft = int(wLeft)
-#     bLeft = int(bLeft)
-#     cRight = int(cRight)
-#     wRight = int(wRight)
-#     bRight = int(bRight)
-#     # from the current position what happens when...
-#     visited.append([cLeft, wLeft, bLeft, cRight, wRight, bRight])
+def makeTree(frontier, key, visited):
+    # get initial state
+    initial = frontier[0]
+    # for dictionary
+    # split into left bank and right bank
+    left, right = initial
+    # get the corresponding variables for the left and right banks
+    cLeft, wLeft, bLeft = left.split(',')
+    cRight, wRight, bRight = right.split(',')
+    # Convert to ints
+    cLeft = int(cLeft)
+    wLeft = int(wLeft)
+    bLeft = int(bLeft)
+    cRight = int(cRight)
+    wRight = int(wRight)
+    bRight = int(bRight)
+    # from the current position what happens when...
+    visited.append([cLeft, wLeft, bLeft, cRight, wRight, bRight])
 
-#     i = 0
-#     y = 25
-#     for i in range(25):
-#         # if on right bank (start bank)
-#         if bRight == 1:
-#             # move 1 chicken
-#             cRight -= 1
-#             cLeft += 1
-#             bRight = 0
-#             bLeft = 1
-#             if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
-#                 visited.append(
-#                     [cLeft, wLeft, bLeft, cRight, wRight, bRight])
+    i = 0
+    y = 25
+    for i in range(25):
+        # if on right bank (start bank)
+        if bRight == 1:
+            # move 1 chicken
+            cRight -= 1
+            cLeft += 1
+            bRight = 0
+            bLeft = 1
+            if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
+                visited.append(
+                    [cLeft, wLeft, bLeft, cRight, wRight, bRight])
 
-#                 valid = isValidMove(cLeft, wLeft, bLeft,
-#                                     cRight, wRight, bRight)
+                valid = isValidMove(cLeft, wLeft, bLeft,
+                                    cRight, wRight, bRight)
 
-#                 if valid:
-#                     frontier[key] = [cLeft, wLeft,
-#                                      bLeft, cRight, wRight, bRight]
-#                     print(frontier[key])
-#                     key += 1
-#                     # continue
-#                     cRight += 1
-#                     cLeft -= 1
-#                     bRight = 1
-#                     bLeft = 0
-#                 else:
-#                     # reset back to before checking if valid
-#                     cRight += 1
-#                     cLeft -= 1
-#                     bRight = 1
-#                     bLeft = 0
-#             else:
-#                 # reset back to before checking if valid
-#                 cRight += 1
-#                 cLeft -= 1
-#                 bRight = 1
-#                 bLeft = 0
-#             # else:
-#             #     break
+                if valid:
+                    frontier[key] = [cLeft, wLeft,
+                                     bLeft, cRight, wRight, bRight]
+                    print(frontier[key])
+                    key += 1
+                    # continue
+                    cRight += 1
+                    cLeft -= 1
+                    bRight = 1
+                    bLeft = 0
+                else:
+                    # reset back to before checking if valid
+                    cRight += 1
+                    cLeft -= 1
+                    bRight = 1
+                    bLeft = 0
+            else:
+                # reset back to before checking if valid
+                cRight += 1
+                cLeft -= 1
+                bRight = 1
+                bLeft = 0
+            # else:
+            #     break
 
-#             # move 2 chickens
-#             cRight -= 2
-#             cLeft += 2
-#             bRight = 0
-#             bLeft = 1
+            # move 2 chickens
+            cRight -= 2
+            cLeft += 2
+            bRight = 0
+            bLeft = 1
 
-#             if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
-#                 visited.append(
-#                     [cLeft, wLeft, bLeft, cRight, wRight, bRight])
+            if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
+                visited.append(
+                    [cLeft, wLeft, bLeft, cRight, wRight, bRight])
 
-#                 valid = isValidMove(cLeft, wLeft, bLeft,
-#                                     cRight, wRight, bRight)
-#                 if valid:
-#                     frontier[key] = [cLeft, wLeft,
-#                                      bLeft, cRight, wRight, bRight]
-#                     print(frontier[key])
-#                     key += 1
-#                     # continue
-#                     cRight += 2
-#                     cLeft -= 2
-#                     bRight = 1
-#                     bLeft = 0
+                valid = isValidMove(cLeft, wLeft, bLeft,
+                                    cRight, wRight, bRight)
+                if valid:
+                    frontier[key] = [cLeft, wLeft,
+                                     bLeft, cRight, wRight, bRight]
+                    print(frontier[key])
+                    key += 1
+                    # continue
+                    cRight += 2
+                    cLeft -= 2
+                    bRight = 1
+                    bLeft = 0
 
-#                 else:
-#                     # reset back to before checking if valid
-#                     cRight += 2
-#                     cLeft -= 2
-#                     bRight = 1
-#                     bLeft = 0
-#             else:
-#                 # reset back to before checking if valid
-#                 cRight += 2
-#                 cLeft -= 2
-#                 bRight = 1
-#                 bLeft = 0
+                else:
+                    # reset back to before checking if valid
+                    cRight += 2
+                    cLeft -= 2
+                    bRight = 1
+                    bLeft = 0
+            else:
+                # reset back to before checking if valid
+                cRight += 2
+                cLeft -= 2
+                bRight = 1
+                bLeft = 0
 
-#             # move 1 wolf
-#             wRight -= 1
-#             wLeft += 1
-#             bRight = 0
-#             bLeft = 1
+            # move 1 wolf
+            wRight -= 1
+            wLeft += 1
+            bRight = 0
+            bLeft = 1
 
-#             if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
-#                 visited.append(
-#                     [cLeft, wLeft, bLeft, cRight, wRight, bRight])
+            if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
+                visited.append(
+                    [cLeft, wLeft, bLeft, cRight, wRight, bRight])
 
-#                 valid = isValidMove(cLeft, wLeft, bLeft,
-#                                     cRight, wRight, bRight)
-#                 if valid:
-#                     frontier[key] = [cLeft, wLeft,
-#                                      bLeft, cRight, wRight, bRight]
-#                     print(frontier[key])
-#                     key += 1
-#                     # continue
-#                     wRight += 1
-#                     wLeft -= 1
-#                     bRight = 1
-#                     bLeft = 0
+                valid = isValidMove(cLeft, wLeft, bLeft,
+                                    cRight, wRight, bRight)
+                if valid:
+                    frontier[key] = [cLeft, wLeft,
+                                     bLeft, cRight, wRight, bRight]
+                    print(frontier[key])
+                    key += 1
+                    # continue
+                    wRight += 1
+                    wLeft -= 1
+                    bRight = 1
+                    bLeft = 0
 
-#                 else:
-#                     # reset back to before checking if valid
-#                     wRight += 1
-#                     wLeft -= 1
-#                     bRight = 1
-#                     bLeft = 0
-#             else:
-#                 # reset back to before checking if valid
-#                 wRight += 1
-#                 wLeft -= 1
-#                 bRight = 1
-#                 bLeft = 0
+                else:
+                    # reset back to before checking if valid
+                    wRight += 1
+                    wLeft -= 1
+                    bRight = 1
+                    bLeft = 0
+            else:
+                # reset back to before checking if valid
+                wRight += 1
+                wLeft -= 1
+                bRight = 1
+                bLeft = 0
 
-#             # move 2 wolves
-#             wRight -= 2
-#             wLeft += 2
-#             bRight = 0
-#             bLeft = 1
+            # move 2 wolves
+            wRight -= 2
+            wLeft += 2
+            bRight = 0
+            bLeft = 1
 
-#             if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
-#                 visited.append(
-#                     [cLeft, wLeft, bLeft, cRight, wRight, bRight])
+            if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
+                visited.append(
+                    [cLeft, wLeft, bLeft, cRight, wRight, bRight])
 
-#                 valid = isValidMove(cLeft, wLeft, bLeft,
-#                                     cRight, wRight, bRight)
-#                 if valid:
-#                     frontier[key] = [cLeft, wLeft,
-#                                      bLeft, cRight, wRight, bRight]
-#                     print(frontier[key])
-#                     key += 1
-#                     # continue
-#                     wRight += 2
-#                     wLeft -= 2
-#                     bRight = 1
-#                     bLeft = 0
+                valid = isValidMove(cLeft, wLeft, bLeft,
+                                    cRight, wRight, bRight)
+                if valid:
+                    frontier[key] = [cLeft, wLeft,
+                                     bLeft, cRight, wRight, bRight]
+                    print(frontier[key])
+                    key += 1
+                    # continue
+                    wRight += 2
+                    wLeft -= 2
+                    bRight = 1
+                    bLeft = 0
 
-#                 else:
-#                     # reset back to before checking if valid
-#                     wRight += 2
-#                     wLeft -= 2
-#                     bRight = 1
-#                     bLeft = 0
-#             else:
-#                 # reset back to before checking if valid
-#                 wRight += 2
-#                 wLeft -= 2
-#                 bRight = 1
-#                 bLeft = 0
+                else:
+                    # reset back to before checking if valid
+                    wRight += 2
+                    wLeft -= 2
+                    bRight = 1
+                    bLeft = 0
+            else:
+                # reset back to before checking if valid
+                wRight += 2
+                wLeft -= 2
+                bRight = 1
+                bLeft = 0
 
-#             # move 1 wolf 1 chicken
-#             cRight -= 1
-#             cLeft += 1
-#             wRight -= 1
-#             wLeft += 1
-#             bRight = 0
-#             bLeft = 1
+            # move 1 wolf 1 chicken
+            cRight -= 1
+            cLeft += 1
+            wRight -= 1
+            wLeft += 1
+            bRight = 0
+            bLeft = 1
 
-#             if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
-#                 visited.append(
-#                     [cLeft, wLeft, bLeft, cRight, wRight, bRight])
+            if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
+                visited.append(
+                    [cLeft, wLeft, bLeft, cRight, wRight, bRight])
 
-#                 valid = isValidMove(cLeft, wLeft, bLeft,
-#                                     cRight, wRight, bRight)
-#                 if valid:
-#                     frontier[key] = [cLeft, wLeft,
-#                                      bLeft, cRight, wRight, bRight]
-#                     print(frontier[key])
-#                     key += 1
-#                     # continue
-#                     wRight += 1
-#                     wLeft -= 1
-#                     cRight += 1
-#                     cLeft -= 1
-#                     bRight = 1
-#                     bLeft = 0
+                valid = isValidMove(cLeft, wLeft, bLeft,
+                                    cRight, wRight, bRight)
+                if valid:
+                    frontier[key] = [cLeft, wLeft,
+                                     bLeft, cRight, wRight, bRight]
+                    print(frontier[key])
+                    key += 1
+                    # continue
+                    wRight += 1
+                    wLeft -= 1
+                    cRight += 1
+                    cLeft -= 1
+                    bRight = 1
+                    bLeft = 0
 
-#                 else:
-#                     # reset back to before checking if valid
-#                     wRight += 1
-#                     wLeft -= 1
-#                     cRight += 1
-#                     cLeft -= 1
-#                     bRight = 1
-#                     bLeft = 0
-#             else:
-#                 # reset back to before checking if valid
-#                 wRight += 1
-#                 wLeft -= 1
-#                 cRight += 1
-#                 cLeft -= 1
-#                 bRight = 1
-#                 bLeft = 0
+                else:
+                    # reset back to before checking if valid
+                    wRight += 1
+                    wLeft -= 1
+                    cRight += 1
+                    cLeft -= 1
+                    bRight = 1
+                    bLeft = 0
+            else:
+                # reset back to before checking if valid
+                wRight += 1
+                wLeft -= 1
+                cRight += 1
+                cLeft -= 1
+                bRight = 1
+                bLeft = 0
 
-#         # if boat is on left bank
-#         else:
-#             # move 1 chicken
-#             cRight += 1
-#             cLeft -= 1
-#             bLeft = 0
-#             bRight = 1
+        # if boat is on left bank
+        else:
+            # move 1 chicken
+            cRight += 1
+            cLeft -= 1
+            bLeft = 0
+            bRight = 1
 
-#             if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
-#                 visited.append(
-#                     [cLeft, wLeft, bLeft, cRight, wRight, bRight])
+            if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
+                visited.append(
+                    [cLeft, wLeft, bLeft, cRight, wRight, bRight])
 
-#                 valid = isValidMove(cLeft, wLeft, bLeft,
-#                                     cRight, wRight, bRight)
-#                 if valid:
-#                     frontier[key] = [cLeft, wLeft,
-#                                      bLeft, cRight, wRight, bRight]
-#                     key += 1
+                valid = isValidMove(cLeft, wLeft, bLeft,
+                                    cRight, wRight, bRight)
+                if valid:
+                    frontier[key] = [cLeft, wLeft,
+                                     bLeft, cRight, wRight, bRight]
+                    key += 1
 
-#                     # continue
-#                     cRight -= 1
-#                     cLeft += 1
-#                     bLeft = 1
-#                     bRight = 0
-#                 else:
-#                     # reset back to before checking if valid
-#                     cRight -= 1
-#                     cLeft += 1
-#                     bLeft = 1
-#                     bRight = 0
+                    # continue
+                    cRight -= 1
+                    cLeft += 1
+                    bLeft = 1
+                    bRight = 0
+                else:
+                    # reset back to before checking if valid
+                    cRight -= 1
+                    cLeft += 1
+                    bLeft = 1
+                    bRight = 0
 
-#             else:
-#                 # reset back to before checking if valid
-#                 cRight -= 1
-#                 cLeft += 1
-#                 bLeft = 1
-#                 bRight = 0
+            else:
+                # reset back to before checking if valid
+                cRight -= 1
+                cLeft += 1
+                bLeft = 1
+                bRight = 0
 
-#             # move 2 chickens
-#             cRight += 2
-#             cLeft -= 2
-#             bLeft = 0
-#             bRight = 1
+            # move 2 chickens
+            cRight += 2
+            cLeft -= 2
+            bLeft = 0
+            bRight = 1
 
-#             if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
-#                 visited.append(
-#                     [cLeft, wLeft, bLeft, cRight, wRight, bRight])
+            if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
+                visited.append(
+                    [cLeft, wLeft, bLeft, cRight, wRight, bRight])
 
-#                 valid = isValidMove(cLeft, wLeft, bLeft,
-#                                     cRight, wRight, bRight)
-#                 if valid:
-#                     frontier[key] = [cLeft, wLeft,
-#                                      bLeft, cRight, wRight, bRight]
-#                     key += 1
-#                     # continue
-#                     cRight -= 2
-#                     cLeft += 2
-#                     bLeft = 1
-#                     bRight = 0
+                valid = isValidMove(cLeft, wLeft, bLeft,
+                                    cRight, wRight, bRight)
+                if valid:
+                    frontier[key] = [cLeft, wLeft,
+                                     bLeft, cRight, wRight, bRight]
+                    key += 1
+                    # continue
+                    cRight -= 2
+                    cLeft += 2
+                    bLeft = 1
+                    bRight = 0
 
-#                 else:
-#                     # reset back to before checking if valid
-#                     cRight -= 2
-#                     cLeft += 2
-#                     bLeft = 1
-#                     bRight = 0
-#             else:
-#                 # reset back to before checking if valid
-#                 cRight -= 2
-#                 cLeft += 2
-#                 bLeft = 1
-#                 bRight = 0
+                else:
+                    # reset back to before checking if valid
+                    cRight -= 2
+                    cLeft += 2
+                    bLeft = 1
+                    bRight = 0
+            else:
+                # reset back to before checking if valid
+                cRight -= 2
+                cLeft += 2
+                bLeft = 1
+                bRight = 0
 
-#             # move 1 wolf
-#             wRight += 1
-#             wLeft -= 1
-#             bLeft = 0
-#             bRight = 1
+            # move 1 wolf
+            wRight += 1
+            wLeft -= 1
+            bLeft = 0
+            bRight = 1
 
-#             if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
-#                 visited.append(
-#                     [cLeft, wLeft, bLeft, cRight, wRight, bRight])
+            if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
+                visited.append(
+                    [cLeft, wLeft, bLeft, cRight, wRight, bRight])
 
-#                 valid = isValidMove(cLeft, wLeft, bLeft,
-#                                     cRight, wRight, bRight)
-#                 if valid:
-#                     frontier[key] = [cLeft, wLeft,
-#                                      bLeft, cRight, wRight, bRight]
-#                     key += 1
-#                     # continue
-#                     wRight -= 1
-#                     wLeft += 1
-#                     bLeft = 1
-#                     bRight = 0
+                valid = isValidMove(cLeft, wLeft, bLeft,
+                                    cRight, wRight, bRight)
+                if valid:
+                    frontier[key] = [cLeft, wLeft,
+                                     bLeft, cRight, wRight, bRight]
+                    key += 1
+                    # continue
+                    wRight -= 1
+                    wLeft += 1
+                    bLeft = 1
+                    bRight = 0
 
-#                 else:
-#                     # reset back to before checking if valid
-#                     wRight -= 1
-#                     wLeft += 1
-#                     bLeft = 1
-#                     bRight = 0
-#             else:
-#                 # reset back to before checking if valid
-#                 wRight -= 1
-#                 wLeft += 1
-#                 bLeft = 1
-#                 bRight = 0
+                else:
+                    # reset back to before checking if valid
+                    wRight -= 1
+                    wLeft += 1
+                    bLeft = 1
+                    bRight = 0
+            else:
+                # reset back to before checking if valid
+                wRight -= 1
+                wLeft += 1
+                bLeft = 1
+                bRight = 0
 
-#             # move 2 wolves
-#             wRight += 2
-#             wLeft -= 2
-#             bLeft = 0
-#             bRight = 1
+            # move 2 wolves
+            wRight += 2
+            wLeft -= 2
+            bLeft = 0
+            bRight = 1
 
-#             if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
-#                 visited.append(
-#                     [cLeft, wLeft, bLeft, cRight, wRight, bRight])
+            if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
+                visited.append(
+                    [cLeft, wLeft, bLeft, cRight, wRight, bRight])
 
-#                 valid = isValidMove(cLeft, wLeft, bLeft,
-#                                     cRight, wRight, bRight)
-#                 if valid:
-#                     frontier[key] = [cLeft, wLeft,
-#                                      bLeft, cRight, wRight, bRight]
-#                     key += 1
-#                     # continue
-#                     wRight -= 2
-#                     wLeft += 2
-#                     bLeft = 1
-#                     bRight = 0
+                valid = isValidMove(cLeft, wLeft, bLeft,
+                                    cRight, wRight, bRight)
+                if valid:
+                    frontier[key] = [cLeft, wLeft,
+                                     bLeft, cRight, wRight, bRight]
+                    key += 1
+                    # continue
+                    wRight -= 2
+                    wLeft += 2
+                    bLeft = 1
+                    bRight = 0
 
-#                 else:
-#                     # reset back to before checking if valid
-#                     wRight -= 2
-#                     wLeft += 2
-#                     bLeft = 1
-#                     bRight = 0
-#             else:
-#                 # reset back to before checking if valid
-#                 wRight -= 2
-#                 wLeft += 2
-#                 bLeft = 1
-#                 bRight = 0
+                else:
+                    # reset back to before checking if valid
+                    wRight -= 2
+                    wLeft += 2
+                    bLeft = 1
+                    bRight = 0
+            else:
+                # reset back to before checking if valid
+                wRight -= 2
+                wLeft += 2
+                bLeft = 1
+                bRight = 0
 
-#             # move 1 wolf 1 chicken
-#             cRight += 1
-#             cLeft -= 1
-#             wRight += 1
-#             wLeft -= 1
-#             bLeft = 0
-#             bRight = 1
+            # move 1 wolf 1 chicken
+            cRight += 1
+            cLeft -= 1
+            wRight += 1
+            wLeft -= 1
+            bLeft = 0
+            bRight = 1
 
-#             if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
-#                 visited.append(
-#                     [cLeft, wLeft, bLeft, cRight, wRight, bRight])
+            if(inVisited(visited, [cLeft, wLeft, bLeft, cRight, wRight, bRight]) == False):
+                visited.append(
+                    [cLeft, wLeft, bLeft, cRight, wRight, bRight])
 
-#                 valid = isValidMove(cLeft, wLeft, bLeft,
-#                                     cRight, wRight, bRight)
-#                 if valid:
-#                     frontier[key] = [cLeft, wLeft,
-#                                      bLeft, cRight, wRight, bRight]
-#                     key += 1
-#                     # continue
-#                     cRight -= 1
-#                     cLeft += 1
-#                     wRight -= 1
-#                     wLeft += 1
-#                     bLeft = 1
-#                     bRight = 0
+                valid = isValidMove(cLeft, wLeft, bLeft,
+                                    cRight, wRight, bRight)
+                if valid:
+                    frontier[key] = [cLeft, wLeft,
+                                     bLeft, cRight, wRight, bRight]
+                    key += 1
+                    # continue
+                    cRight -= 1
+                    cLeft += 1
+                    wRight -= 1
+                    wLeft += 1
+                    bLeft = 1
+                    bRight = 0
 
-#                 else:
-#                     # reset back to before checking if valid
-#                     cRight -= 1
-#                     cLeft += 1
-#                     wRight -= 1
-#                     wLeft += 1
-#                     bLeft = 1
-#                     bRight = 0
-#             else:
-#                 # reset back to before checking if valid
-#                 cRight -= 1
-#                 cLeft += 1
-#                 wRight -= 1
-#                 wLeft += 1
-#                 bLeft = 1
-#                 bRight = 0
-#         i += 1
-#     return frontier
+                else:
+                    # reset back to before checking if valid
+                    cRight -= 1
+                    cLeft += 1
+                    wRight -= 1
+                    wLeft += 1
+                    bLeft = 1
+                    bRight = 0
+            else:
+                # reset back to before checking if valid
+                cRight -= 1
+                cLeft += 1
+                wRight -= 1
+                wLeft += 1
+                bLeft = 1
+                bRight = 0
+        i += 1
+    return frontier
 
 
 def isValidMove(cLeft, wLeft, bLeft, cRight, wRight, bRight):
@@ -431,71 +432,53 @@ def isValidMove(cLeft, wLeft, bLeft, cRight, wRight, bRight):
 
 
 def bfs(initialState, goalState, output):
+    # Convert list of strings with commas into a usable list of ints
+    initial = []
+    for element in initialState:
+        element = element.replace(',', '')
+        for item in element:
+            initial.append(int(item))
 
-    # Psuedocode from lecture for graph search
-    # function GRAPH-SEARCH(problem) returns a solution, or failure
-    #     initialize the frontier using the initial state of problem
-    #     initialize the explored set to be empty
-    #     loop do
-    #         if the fronteir is empy then return failure
-    #         choose a elage node and remove it from the frontier
-    #         if the node contains a goal state then return the corresponding solution
-    #         add the node to the explored set
-    #         expand the chosen node, adding the resulting nodes to the frontier
-    #             only if not in the frontier or explored set
+    goal = []
+    for element in goalState:
+        element = element.replace(',', '')
+        for item in element:
+            goal.append(int(item))
 
-    # initialize dictionary
-    element = 0
-    frontier = {}
+    print(initial)
+    print(goal)
+    # output is a filename
+
+    frontier = queue.Queue()
+    frontier.put(initial)
+
     explored = []
-    frontier[element] = initialState
+    numNodes = 0
 
-    # while initialState != goalState:
-    if bool(frontier) == False:
-        sys.exit("Frontier is empty")
-    frontier = makeTree(frontier, element, explored)
+    while frontier is not None:
+        currentNode = frontier.get()
+        if currentNode in explored:
+            continue
+        if currentNode == goal:
+            print("Goal reached!!!")
+            print(currentNode)
+            return
+        print(currentNode)
+        children = expand(currentNode, frontier, explored)
 
-    print(frontier)
+        for child in children:
+            numNodes += 1
+            frontier.put(child)
+        explored.append(currentNode)
+        print("Added", currentNode, "to explored")
 
 
 
-class node:
-    def __init__(self, state, children=None):
-        self.state = state
-        self.children = children or []
-        self.parent = None
-        for child in self.children:
-            child.parent = self
-
-
-class gameState:  # UNUSED, NOT WORTH
-
-    def __init__(state):
-        self.state = state
-        # self.cLeft = cLeft
-        # self.wLeft = wLeft
-        # self.bLeft = bLeft
-        # self.cRight = cRight
-        # self.wRight = wRight
-        # self.bRight = bRight
-
-    def __eq__(self, other):
-
-        return self.state == other.state
-
-    def isValidState(self):
-        if cLeft >= 0 and wLeft >= 0 and cRight >= 0 and wRight >= 0 and (cLeft >= wLeft or cLeft == 0) and (cRight >= wRight or cRight == 0):
-            return True
-        else:
-            return False
-
-    def print(self):
-        return
 
 # *****************************************************************************
 
 
-def isValidMove(state):
+def isValidState(state):
     # No negative animals
     if (state[LC] < 0) or (state[LW] < 0) or (state[RC] < 0) or (state[RW] < 0):
         return False
@@ -513,8 +496,6 @@ def printExplored(explored):
         print(index, list)
         index += 1
 
-
-# handler for recursive dfs
 
 
 def dfs(initialState, goalState, output):
@@ -569,11 +550,11 @@ def dfs(initialState, goalState, output):
 
 
 def expand(state, frontier, explored):
-    # expands a state, adding up to 5 unexplored leaves to the Frontier
+    # expands a state, returning up to 5 unexplored leaves
     leaves = []
     # Process:
     # generate leaf
-    # if valid and unexplored, add to frontier
+    # if valid and unexplored, add to leaves[] and return leaves[]
 
     # 1: 1 chicken in the boat
     generated = state.copy()
@@ -587,7 +568,7 @@ def expand(state, frontier, explored):
     generated[LB] ^= 1  # swap boat bank
     generated[RB] ^= 1  # swap boat bank
 
-    if isValidMove(generated) and generated not in explored:
+    if isValidState(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
 
@@ -601,7 +582,7 @@ def expand(state, frontier, explored):
         generated[RC] -= 2
     generated[LB] ^= 1  # swap boat bank
     generated[RB] ^= 1  # swap boat bank
-    if isValidMove(generated) and generated not in explored:
+    if isValidState(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
 
@@ -615,7 +596,7 @@ def expand(state, frontier, explored):
         generated[RW] -= 1
     generated[LB] ^= 1  # swap boat bank
     generated[RB] ^= 1  # swap boat bank
-    if isValidMove(generated) and generated not in explored:
+    if isValidState(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
 
@@ -633,7 +614,7 @@ def expand(state, frontier, explored):
         generated[RC] -= 1
     generated[LB] ^= 1  # swap boat bank
     generated[RB] ^= 1  # swap boat bank
-    if isValidMove(generated) and generated not in explored:
+    if isValidState(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
 
@@ -647,7 +628,7 @@ def expand(state, frontier, explored):
         generated[RW] -= 2
     generated[LB] ^= 1  # swap boat bank
     generated[RB] ^= 1  # swap boat bank
-    if isValidMove(generated) and generated not in explored:
+    if isValidState(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
     # print("Expand() found ", len(leaves), "leaves"
@@ -722,18 +703,18 @@ def recursive_iddfs(explored, current, goal, depth, numNodes, output):
 
 
 
-def heuristic(n,goal):
+def heuristic(n,goal): # calculates h(n) for input state n as a list
     if n == goal: return 0
-    # assume animals start on left bank and move to right bank
+    # assume animals start on right bank and move to left bank
     return max(1,(n[RC] + n[RW])-1)
     # subtract 1, becuase up to 2 animals can be moved at once for final move
     # 1 animal left: returns 1
     # 2 animals left: returns 1
     # 3 animals left: returns 2 (an underestimate)
 
-def listToString(list):
+def listToString(list): # helper function to let nodes be dict keys as strings
     string_list = [str(int) for int in list]
-    return "".join(string_list)
+    return ",".join(string_list)
 
 def astar(initialState, goalState, output):
     with open(output, "w") as f:
@@ -751,23 +732,21 @@ def astar(initialState, goalState, output):
         print("Goal: ", goal)
 
         frontier = {} # Frontier is a dictionary with key = f(n) and value = state
-        print(listToString(initial))
-        return
-
-        frontier[] = initial # add initial element to the frontier
-        explored = []
+        parent = {} # Parent is a dictionary with key = node and value = parent node
+        g_set = {} # Key = node, value = cost to get to n from start
+        f_set = {} # f(n) = g(n) + h(n)
+        current = listToString(initial)
+        frontier[current] = 0 # add initial element to the frontier
+        parent[current] = None
+        f_set[current] = heuristic(initial,goal)
+        explored = [] # list of states explored, with lists representing states
         explored_count = 0  # A count of how many nodes have been explored/popped
-
-        g_set = [] # cost to get to n from start
-        h_set = [] #
-        f_set = [] # f(n) = g(n) + h(n)
-        node_index = 0
 
         while frontier: #while frontier isn't empty
             #min(frontier) is the lowest f(n), so frontier[min(frontier)] is the best node
-            key = min(frontier)
-            currentNode = frontier.pop(key)
-            print("Popped",currentNode,"with heuristic",key)
+            key = min(frontier.values())
+            del frontier[key]
+            print("Popped",key,"with heuristic",key)
 
             #currentNode = frontier.pop(0)
             if currentNode in explored:  # duplicates are allowed in the frontier
@@ -790,7 +769,7 @@ def astar(initialState, goalState, output):
 
             for child in children:
                 new_g = g[parent] + 1
-                if new_g < g[child]
+                # if new_g < g[child]
                 frontier[heuristic(child,goal)] = child
 
         print("no solution found")
