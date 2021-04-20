@@ -1,6 +1,14 @@
 import getopt
 import sys
 
+expanded_count = 0
+# Useful defines
+LC = 0
+LW = 1
+LB = 2
+RC = 3
+RW = 4
+RB = 5
 
 def inVisited(visited, element):
     if element in visited:
@@ -468,6 +476,18 @@ class gameState: #UNUSED, NOT WORTH
     def print(self):
         return
 
+# *****************************************************************************
+def isValidMove(state):
+    # No negative animals
+    if (state[LC] < 0) or (state[LW] < 0) or (state[RC] < 0) or (state[RW] < 0):
+        return False
+    # Handle left bank eats
+    if (state[LC] < state[LW]) and (state[LC] != 0):
+        return False
+    if (state[RC] < state[RW]) and (state[RC] != 0):
+        return False
+    return True
+
 
 # handler for recursive dfs
 def dfs(initialState, goalState,output):
@@ -485,21 +505,30 @@ def dfs(initialState, goalState,output):
             goal.append(int(item))
     print(initial)
     print(goal)
-
-
-
     # output is a filename
-
-    counter = 0 # Number of nodes expanded.
-
-    #implement the graph-search version, which is complete
     frontier = []
-    frontier.insert(0,initial) # add initial state / root
+    frontier.insert(0,initial)
     explored = []
+    while frontier is not None:
+        currentNode = frontier.pop()
+        if currentNode in explored: continue
+        if currentNode == goal: return
+        print(currentNode)
+        children = expand(currentNode,frontier, explored)
 
-
-    print("Starting recursive calls...")
-    dfs_recursive(frontier,goalState,explored)
+        for child in children:
+            frontier.insert(0,child)
+        explored.append(currentNode)
+        print("Added",currentNode,"to explored")
+    # # counter = 0 # Number of nodes expanded.
+    #
+    # #implement the graph-search version, which is complete
+    # frontier = []
+    # frontier.insert(0,initial) # add initial state / root
+    # explored = []
+    # global expanded_count
+    # expanded_count = 0
+    # dfs_recursive(frontier,goalState,explored)
 
 
 
@@ -509,30 +538,43 @@ def dfs_recursive(frontier,goalState,explored):
     # goalState: a list containing the goal state
     # explored: a list of states that have been explored (popped)
     # output: a list of states tracing back to the root???
+    global expanded_count
+
+    # # Check if frontier empty
+    while frontier is not empty:
+        #pop off frontier top of
+        # TA said compare node with goal when its popped
+        currentNode = frontier.pop() # pop off front of LIFO for DFS
+        # global expanded_count += 1 # Increment count between pop and expansion
+        # Check if goal is reached
+        if currentNode == goalState:
+            print("Goal reached!!!")
+            sys.exit("Goal reached!!!")
+            return
+        # Add current node to explored
+        explored.append(currentNode)
+        print("Added",currentNode,"to explored")
+        # Increment # nodes counter
+        expanded_count += 1
+
+        # Call expand function
+        # print("Frontier before expand:",frontier)
+        discovered = expand(currentNode,frontier,explored)
+        # print("Frontier after expand:",frontier)
+
+        # call DFS recursively
+        for leaf in discovered:
+            dfs_recursive(frontier, goalState,explored)
 
 
-    # if frontier empty, return fail
-    if frontier is None:
-        print("Frontier empty! Failed.")
-
-    #pop frontier.
-    # TA said compare node with goal when its popped
-    currentNode = frontier.pop() # pop off front of LIFO for DFS
-    expanded_count += 1 # Increment count between pop and expansion
-    # Check if goal is reached
-    if currentNode == goalState:
-        print("Goal reached")
-        return
-    explored.append(currentNode)
-
-    expand(currentNode,frontier,explored)
 
 
 
-def expand(state,frontier,explored): # expands a state, generating up to 5 unexplored leaves to add to the Frontier
-    print("Expanding",state)
-    print("Frontier:",frontier)
-    LC = 0
+
+def expand(state,frontier,explored):
+    # expands a state, adding up to 5 unexplored leaves to the Frontier
+    leaves = []
+    global LC
     LW = 1
     LB = 2
     RC = 3
@@ -540,12 +582,11 @@ def expand(state,frontier,explored): # expands a state, generating up to 5 unexp
     RB = 5
     # Process:
     # generate leaf
-    # check if valid
-    # if explored, don't add to frontier
+    # if valid and unexplored, add to frontier
 
 
     # 1 chicken in the boat
-    generated = state
+    generated = state.copy()
     if(generated[LB]): # if boat is on left side
         generated[LC] -= 1
         generated[RC] += 1
@@ -554,19 +595,72 @@ def expand(state,frontier,explored): # expands a state, generating up to 5 unexp
         generated[RC] -= 1
     generated[LB] ^= 1 # swap boat bank
     generated[RB] ^= 1 # swap boat bank
+    print(generated not in explored)
     if isValidMove(generated) and generated not in explored:
-        frontier.insert(0,node)
+        # print("Added leaf:",generated)
+        leaves.insert(0,generated)
 
     # 2 chickens in the boat
-    frontier.insert(0,node)
-    frontier.insert(0,node) # 1 wolf in the boat
-    frontier.insert(0,node) # 1 wolf 1 chicken
-    frontier.insert(0,node) # 2 wolves in the boat
+    generated = state.copy()
+    if(generated[LB]): # if boat is on left side
+        generated[LC] -= 2
+        generated[RC] += 2
+    else:
+        generated[LC] += 2
+        generated[RC] -= 2
+    generated[LB] ^= 1 # swap boat bank
+    generated[RB] ^= 1 # swap boat bank
+    if isValidMove(generated) and generated not in explored:
+        # print("Added leaf:",generated)
+        leaves.insert(0,generated)
 
-    print("New Frontier:", frontier)
-    pass
+    # 1 wolf in the boat
+    generated = state.copy()
+    if(generated[LB]): # if boat is on left side
+        generated[LW] -= 1
+        generated[RW] += 1
+    else:
+        generated[LW] += 1
+        generated[RW] -= 1
+    generated[LB] ^= 1 # swap boat bank
+    generated[RB] ^= 1 # swap boat bank
+    if isValidMove(generated) and generated not in explored:
+        # print("Added leaf:",generated)
+        leaves.insert(0,generated)
 
+    # 1 wolf 1 chicken
+    generated = state.copy()
+    if(generated[LB]): # if boat is on left side
+        generated[LW] -= 1
+        generated[LC] -= 1
+        generated[RW] += 1
+        generated[RC] += 1
+    else: # if boat is on right side
+        generated[LW] += 1
+        generated[LC] += 1
+        generated[RW] -= 1
+        generated[RC] -= 1
+    generated[LB] ^= 1 # swap boat bank
+    generated[RB] ^= 1 # swap boat bank
+    if isValidMove(generated) and generated not in explored:
+        # print("Added leaf:",generated)
+        leaves.insert(0,generated)
 
+    # 2 wolves in the boat
+    generated = state.copy()
+    if(generated[LB]): # if boat is on left side
+        generated[LW] -= 2
+        generated[RW] += 2
+    else:
+        generated[LW] += 2
+        generated[RW] -= 2
+    generated[LB] ^= 1 # swap boat bank
+    generated[RB] ^= 1 # swap boat bank
+    if isValidMove(generated) and generated not in explored:
+        # print("Added leaf:",generated)
+        leaves.insert(0,generated)
+    print("Expand() found ", len(leaves), "leaves")
+    return leaves
 
 
 
@@ -596,7 +690,7 @@ def main():
     # remove newlines
     initialState = list(
         map(str.strip, initialState))
-    print(initialState)
+    print("initialState:",initialState)
 
     goalState = open(goalStateFile, "r")
     goalState = goalState.readlines()
