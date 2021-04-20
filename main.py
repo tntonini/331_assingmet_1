@@ -12,6 +12,7 @@ RC = 3
 RW = 4
 RB = 5
 
+
 def inVisited(visited, element):
     if element in visited:
         return True
@@ -457,7 +458,6 @@ def bfs(initialState, goalState, output):
 
 
 
-
 class node:
     def __init__(self, state, children = None):
         self.state = state
@@ -467,7 +467,9 @@ class node:
             child.parent = self
 
 
+
 class gameState: #UNUSED, NOT WORTH
+
     def __init__(state):
         self.state = state
         # self.cLeft = cLeft
@@ -477,7 +479,9 @@ class gameState: #UNUSED, NOT WORTH
         # self.wRight = wRight
         # self.bRight = bRight
 
+
     def __eq__(self,other):
+
         return self.state == other.state
 
     def isValidState(self):
@@ -486,11 +490,12 @@ class gameState: #UNUSED, NOT WORTH
         else:
             return False
 
-
     def print(self):
         return
 
 # *****************************************************************************
+
+
 def isValidMove(state):
     # No negative animals
     if (state[LC] < 0) or (state[LW] < 0) or (state[RC] < 0) or (state[RW] < 0):
@@ -508,36 +513,37 @@ def printExplored(explored):
         print(index,list)
         index += 1
 
+
 # handler for recursive dfs
-def dfs(initialState, goalState,output):
-    with open(output,"w") as f:
+
+
+def dfs(initialState, goalState, output):
+    with open(output, "w") as f:
         # output is a filename
         initial = []
         for line in initialState:
             for var in line.split(","):   # store every item as its own element,
-                  initial.append(int(var)) # even if there are multiple on 1 line
-        print("Start: ",initial)
+                # even if there are multiple on 1 line
+                initial.append(int(var))
+        print("Start: ", initial)
         goal = []
         for line in goalState:
             for var in line.split(","):   # store every item as its own element,
-                  goal.append(int(var)) # even if there are multiple on 1 line
-        print("Goal: ",goal)
-
-
-
+                goal.append(int(var))  # even if there are multiple on 1 line
+        print("Goal: ", goal)
 
         frontier = []
-        frontier.insert(0,initial)
+        frontier.insert(0, initial)
         explored = []
-        explored_count = 0 # A count of how many nodes have been explored/popped
+        explored_count = 0  # A count of how many nodes have been explored/popped
         while frontier:
             currentNode = frontier.pop(0)
-            if currentNode in explored: # duplicates are allowed in the frontier
+            if currentNode in explored:  # duplicates are allowed in the frontier
                 continue
             explored.append(currentNode)
             # print(explored_count,"Popped",currentNode,"off frontier") #DEBUG
             if currentNode == goal:
-                print("Nodes explored:",explored_count)
+                print("Nodes explored:", explored_count)
                 printExplored(explored)
 
                 f.write("Nodes explored: "+str(explored_count)+"\n")
@@ -548,22 +554,19 @@ def dfs(initialState, goalState,output):
                 return
             # explored.append(currentNode)
             explored_count += 1
-            children = expand(currentNode,frontier, explored)
+            children = expand(currentNode, frontier, explored)
 
             for child in children:
-                frontier.insert(0,child)
+                frontier.insert(0, child)
 
         print("no solution found")
-        print("Nodes explored:",explored_count)
+        print("Nodes explored:", explored_count)
         f.write("no solution found\n")
         f.write("Nodes explored:"+str(explored_count)+"\n")
         return
 
 
-
-
-
-def expand(state,frontier,explored):
+def expand(state, frontier, explored):
     # expands a state, adding up to 5 unexplored leaves to the Frontier
     leaves = []
     LC = 0
@@ -579,85 +582,134 @@ def expand(state,frontier,explored):
 
     # 1: 1 chicken in the boat
     generated = state.copy()
-    if(generated[LB]): # if boat is on left side
+    if(generated[LB]):  # if boat is on left side
         generated[LC] -= 1
         generated[RC] += 1
     else:
         generated[LC] += 1
         generated[RC] -= 1
-    generated[LB] ^= 1 # swap boat bank
-    generated[RB] ^= 1 # swap boat bank
+
+    generated[LB] ^= 1  # swap boat bank
+    generated[RB] ^= 1  # swap boat bank
+
     if isValidMove(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
 
     # 2: 2 chickens in the boat
     generated = state.copy()
-    if(generated[LB]): # if boat is on left side
+    if(generated[LB]):  # if boat is on left side
         generated[LC] -= 2
         generated[RC] += 2
     else:
         generated[LC] += 2
         generated[RC] -= 2
-    generated[LB] ^= 1 # swap boat bank
-    generated[RB] ^= 1 # swap boat bank
+    generated[LB] ^= 1  # swap boat bank
+    generated[RB] ^= 1  # swap boat bank
     if isValidMove(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
 
     # 1 wolf in the boat
     generated = state.copy()
-    if(generated[LB]): # if boat is on left side
+    if(generated[LB]):  # if boat is on left side
         generated[LW] -= 1
         generated[RW] += 1
     else:
         generated[LW] += 1
         generated[RW] -= 1
-    generated[LB] ^= 1 # swap boat bank
-    generated[RB] ^= 1 # swap boat bank
+    generated[LB] ^= 1  # swap boat bank
+    generated[RB] ^= 1  # swap boat bank
     if isValidMove(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
 
     # 1 wolf 1 chicken
     generated = state.copy()
-    if(generated[LB]): # if boat is on left side
+    if(generated[LB]):  # if boat is on left side
         generated[LW] -= 1
         generated[LC] -= 1
         generated[RW] += 1
         generated[RC] += 1
-    else: # if boat is on right side
+    else:  # if boat is on right side
         generated[LW] += 1
         generated[LC] += 1
         generated[RW] -= 1
         generated[RC] -= 1
-    generated[LB] ^= 1 # swap boat bank
-    generated[RB] ^= 1 # swap boat bank
+    generated[LB] ^= 1  # swap boat bank
+    generated[RB] ^= 1  # swap boat bank
     if isValidMove(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
 
     # 5: 2 wolves in the boat
     generated = state.copy()
-    if(generated[LB]): # if boat is on left side
+    if(generated[LB]):  # if boat is on left side
         generated[LW] -= 2
         generated[RW] += 2
     else:
         generated[LW] += 2
         generated[RW] -= 2
-    generated[LB] ^= 1 # swap boat bank
-    generated[RB] ^= 1 # swap boat bank
+    generated[LB] ^= 1  # swap boat bank
+    generated[RB] ^= 1  # swap boat bank
     if isValidMove(generated) and generated not in explored:
         # print("Added leaf:",generated)
         leaves.append(generated)
-    # print("Expand() found ", len(leaves), "leaves")
+    # print("Expand() found ", len(leaves), "leaves"
 
     return leaves
 
 
-
 def iddfs(initialState, goalState, output):
-    print("iddfs")
+    numNodes = 0
+    # Convert list of strings with commas into a usable list of ints
+    initial = []
+    for element in initialState:
+        element = element.replace(',', '')
+        for item in element:
+            initial.append(int(item))
+
+    goal = []
+    for element in goalState:
+        element = element.replace(',', '')
+        for item in element:
+            goal.append(int(item))
+    print(initial)
+    print(goal)
+    print(initial[3])
+    frontier = []
+    current = 0
+    frontier.insert(0, initial)
+    explored = []
+
+    while frontier:
+        currentNode = frontier.pop()
+
+        children = expand(currentNode, frontier, explored)
+
+        for child in children:
+            frontier.insert(0, child)
+        explored.append(currentNode)
+        # print("Added", currentNode, "to explored")
+
+    for depth in range(100):
+        goalNode = recursive_iddfs(explored, current, goal, depth, numNodes)
+        if goalNode == True:
+            print("goalNode")
+
+
+def recursive_iddfs(explored, current, goal, depth, numNodes):
+    if explored[current] == goal:
+        print("Goal reached!!!")
+        print(explored[current])
+        return True  # found the goal node
+    if depth <= 0:
+        return False
+
+    numNodes += 1
+    if(recursive_iddfs(explored, current + 1, goal, depth - 1, numNodes)):
+        return True
+    return False
 
 
 def astar(initialState, goalState, output):
